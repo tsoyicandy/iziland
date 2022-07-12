@@ -1,6 +1,5 @@
 package com.itiad.iziland.models.entities;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

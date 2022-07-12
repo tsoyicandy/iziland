@@ -1,6 +1,7 @@
 package com.itiad.iziland.models.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,14 +19,12 @@ public class Discussion {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="client")
-    private Client client;
+    @JoinColumn(name="utilisateur")
+    private Utilisateur utilisateur;
 
-    @ManyToOne
-    @JoinColumn(name="gestionnaire")
-    private Gestionnaire gestionnaire;
 
     @OneToMany(mappedBy="discussion")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Message> Listmessage;
 
 }

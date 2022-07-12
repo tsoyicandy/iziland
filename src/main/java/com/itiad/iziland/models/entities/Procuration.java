@@ -20,7 +20,7 @@ public class Procuration {
     private String motif;
 
     @ManyToOne
-    @JoinColumn(name="client")
-    private Client client;
+    @JoinColumn(name="utilisateur")
+    private Utilisateur utilisateur;
 
 }

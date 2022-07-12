@@ -2,6 +2,7 @@
 package com.itiad.iziland.models.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +20,11 @@ public class Procedural {
     private Long id;
     private  String nom;
     @OneToMany(mappedBy="procedural")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Transaction> Listtransaction;
 
 
     @OneToMany(mappedBy="procedural")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Processus> Listprocessus;
 }

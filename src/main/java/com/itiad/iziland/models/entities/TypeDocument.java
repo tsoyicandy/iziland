@@ -1,5 +1,6 @@
 package com.itiad.iziland.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ public class TypeDocument {
     private Long id;
     private  String nom;
     @OneToMany(mappedBy="typeDocument")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Document> Listdocument;
 
 }

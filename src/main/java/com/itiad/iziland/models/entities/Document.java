@@ -17,12 +17,15 @@ public class Document {
     private Long id;
     private String nom;
     private String lienDocument;
+
     @ManyToOne
     @JoinColumn(name="typeDocument")
     private TypeDocument typeDocument;
+
     @ManyToOne
-    @JoinColumn(name="gestionnaire")
-    private Gestionnaire gestionnaire;
+    @JoinColumn(name="utilisateur")
+    private Utilisateur utilisateur;
+
     @ManyToOne
     @JoinColumn(name="transaction")
     private Transaction transaction;

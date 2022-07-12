@@ -1,6 +1,7 @@
 package com.itiad.iziland.models.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class Transaction {
     private String etat;
 
     @OneToMany(mappedBy="transaction")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Document> Listdocument;
 
     @ManyToOne
@@ -30,8 +32,8 @@ public class Transaction {
     @JoinColumn(name="bien")
     private Bien bien;
     @ManyToOne
-    @JoinColumn(name="client")
-    private Client client;
+    @JoinColumn(name="utilisateur")
+    private Utilisateur utilisateur;
 
 
 }
