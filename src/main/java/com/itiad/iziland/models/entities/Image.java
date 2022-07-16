@@ -14,6 +14,7 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private  String lienImage;
+    private  String nom;
     @ManyToOne
     @JoinColumn(name="bien")
     private Bien bien;

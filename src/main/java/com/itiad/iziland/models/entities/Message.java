@@ -14,16 +14,19 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private  String date;
+    private String contenu;
 
     @ManyToOne
     @JoinColumn(name="discussion")
     private Discussion discussion;
 
-    @ManyToOne
-    @JoinColumn(name="auteur")
     private Utilisateur auteur;
 
-
-
+    @Override
+    public String toString() {
+        return "Message{" +
+                "contenu='" + contenu + '\'' +
+                ", auteur=" + auteur.getNom() +
+                '}';
+    }
 }

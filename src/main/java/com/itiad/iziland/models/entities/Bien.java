@@ -25,10 +25,11 @@ public class Bien {
     private String proprietaire;
     private Long longitude;
     private Long latitude;
-    private Integer prix;
+    private Long prix;
     private String typeDeValorisation;
     private Boolean titre;
     private String etat;
+
 
     @OneToMany(mappedBy="bien")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

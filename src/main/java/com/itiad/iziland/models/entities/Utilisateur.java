@@ -44,7 +44,6 @@ public class Utilisateur {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> role = new HashSet<>();
 
-
     @OneToMany(mappedBy="utilisateur")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Procuration> Listprocuration;
