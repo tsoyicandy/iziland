@@ -19,9 +19,9 @@ public class Procedural {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private  String nom;
-    @OneToMany(mappedBy="procedural")
+    /*@OneToMany(mappedBy="procedural")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private List<Transaction> Listtransaction;
+    private List<Transaction> Listtransaction;*/
 
 
     @OneToMany(mappedBy="procedural")

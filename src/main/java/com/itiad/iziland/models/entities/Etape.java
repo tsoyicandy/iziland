@@ -1,6 +1,5 @@
 package com.itiad.iziland.models.entities;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,28 +12,24 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Entity
-public class Transaction {
+public class Etape {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String dateFin;
     private String dateDebut;
+
     private EtatTransaction etat;
-    @ManyToOne
-    @JoinColumn(name="etape")
-    private Etape etapeEnCours;
-
-
 
     @ManyToOne
-    @JoinColumn(name="procedural")
-    private Procedural procedural;
-    @ManyToOne
-    @JoinColumn(name="bien")
-    private Bien bien;
-    @ManyToOne
-    @JoinColumn(name="utilisateur")
-    private Utilisateur utilisateur;
+    @JoinColumn(name="transaction")
+    private Transaction transaction;
 
+    @ManyToOne
+    @JoinColumn(name="processus")
+    private Processus processus;
 
+    @OneToMany(mappedBy="etape")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private List<FileInfo> listdocument;
 }

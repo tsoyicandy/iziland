@@ -19,7 +19,8 @@ public class Message {
     @ManyToOne
     @JoinColumn(name="discussion")
     private Discussion discussion;
-
+    @ManyToOne
+    @JoinColumn(name="utilisateur")
     private Utilisateur auteur;
 
     @Override

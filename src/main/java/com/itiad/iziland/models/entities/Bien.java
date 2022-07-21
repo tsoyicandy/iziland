@@ -22,7 +22,11 @@ public class Bien {
     private String typeBien;
     private String description;
     private String lieu;
-    private String proprietaire;
+
+    @ManyToOne
+    @JoinColumn(name="proprietaire")
+    private Proprietaire proprietaire;
+
     private Long longitude;
     private Long latitude;
     private Long prix;
@@ -33,7 +37,7 @@ public class Bien {
 
     @OneToMany(mappedBy="bien")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private List<Image> Listimage;
+    private List<FileInfo> Listimage;
 
     @OneToMany(mappedBy="bien")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

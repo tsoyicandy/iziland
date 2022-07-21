@@ -1,16 +1,12 @@
 package com.itiad.iziland.models.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.itiad.iziland.models.AppUtilisateurRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,9 +48,9 @@ public class Utilisateur {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Transaction> Listtransaction;
 
-    @OneToMany(mappedBy="utilisateur")
+    /*@OneToMany(mappedBy="utilisateur")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private List<Document> Listdocument;
+    private List<FileInfo> listdocument;*/
 
     @OneToMany(mappedBy="utilisateur")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
