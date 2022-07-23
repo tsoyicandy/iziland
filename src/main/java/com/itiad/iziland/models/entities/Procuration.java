@@ -14,10 +14,20 @@ import javax.persistence.*;
 public class Procuration {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+
     private Long id;
+
     private String nomBeneficiare;
+
     private String adresse;
+
+    private String cni;
+
+    private String numero;
+
     private String motif;
+
+    private String qrcode;
 
     @ManyToOne
     @JoinColumn(name="utilisateur")

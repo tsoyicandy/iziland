@@ -24,7 +24,9 @@ public class Transaction {
     @JoinColumn(name="etape")
     private Etape etapeEnCours;
 
-
+    @ManyToOne
+    @JoinColumn(name="procuration")
+    private Procuration procuration;
 
     @ManyToOne
     @JoinColumn(name="procedural")
