@@ -16,10 +16,12 @@ public class Etape {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String dateFin;
+
     private String dateDebut;
 
-    private EtatTransaction etat;
+    private String etat;
 
     @ManyToOne
     @JoinColumn(name="transaction")

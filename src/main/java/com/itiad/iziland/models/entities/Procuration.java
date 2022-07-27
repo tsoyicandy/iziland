@@ -21,6 +21,8 @@ public class Procuration {
 
     private String adresse;
 
+    private String dateDeCreation;
+
     private String cni;
 
     private String numero;

@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
+import java.sql.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,10 +19,10 @@ public class Transaction {
     private Long id;
     private String dateFin;
     private String dateDebut;
-    private EtatTransaction etat;
-    @ManyToOne
-    @JoinColumn(name="etape")
-    private Etape etapeEnCours;
+    private String etat;
+
+
+    private String etapeEnCours;
 
     @ManyToOne
     @JoinColumn(name="procuration")
@@ -31,12 +31,13 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name="procedural")
     private Procedural procedural;
+
     @ManyToOne
     @JoinColumn(name="bien")
     private Bien bien;
+
     @ManyToOne
     @JoinColumn(name="utilisateur")
     private Utilisateur utilisateur;
-
 
 }
