@@ -2,6 +2,7 @@ package com.itiad.iziland.presentation.restcontroller;
 
 import com.itiad.iziland.models.entities.Procedural;
 import com.itiad.iziland.repositories.ProceduralRepository;
+import com.itiad.iziland.repositories.ProcessusRepository;
 import com.itiad.iziland.security.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,8 @@ import java.util.Map;
 public class ProceduralRestController {
     @Autowired
     private ProceduralRepository proceduralRepository;
+    @Autowired
+    private ProcessusRepository processusRepository;
 
 
     @GetMapping("/procedurals")
@@ -70,6 +73,7 @@ public class ProceduralRestController {
     public ResponseEntity<Map<String, Boolean>> deleteProcedural(@PathVariable Long id){
         Procedural procedural = proceduralRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("cette procedure n'existe pas !!"))) ;
         proceduralRepository.delete(procedural);
+        processusRepository.deleteByProcedural(procedural);
         Map<String, Boolean> reponse = new HashMap<>();
         reponse.put("supprime", Boolean.TRUE);
         return ResponseEntity.ok(reponse);
@@ -79,6 +83,7 @@ public class ProceduralRestController {
     public ResponseEntity<HttpStatus> deleteAllProcedurals(){
         try{
             proceduralRepository.deleteAll();
+            processusRepository.deleteAll();
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

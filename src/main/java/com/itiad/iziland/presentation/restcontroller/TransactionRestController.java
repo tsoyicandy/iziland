@@ -8,10 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/")
 public class TransactionRestController {
@@ -27,6 +26,8 @@ public class TransactionRestController {
     private UtilisateurRepository utilisateurRepository;
     @Autowired
     private ProcurationRepository procurationRepository;
+    @Autowired
+    private EtapeRepository etapeRepository;
 
     @GetMapping("/transactions")
     public List<Transaction> getAllTransactions() {
@@ -84,9 +85,19 @@ public class TransactionRestController {
     }
 
     @PutMapping("/transactions/{id}/{idprocuration}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long id,@PathVariable Long idprocuration, @RequestBody Transaction transaction){
+    public ResponseEntity<Transaction> updateTransactionProcuration(@PathVariable Long id,@PathVariable Long idprocuration){
         Transaction tr = transactionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("wrong transaction !!"))) ;
         tr.setProcuration(getProcurationById(idprocuration));
+        tr.setEtat("en Cours");
+        Transaction transactionupdated = transactionRepository.save(tr);
+
+        return ResponseEntity.ok(transactionupdated);
+    }
+
+    @PutMapping("/transactions/terminate/{id}")
+    public ResponseEntity<Transaction> terminateTransaction(@PathVariable Long id){
+        Transaction tr = transactionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("wrong transaction !!"))) ;
+        tr.setEtat("Termine");
         Transaction transactionupdated = transactionRepository.save(tr);
 
         return ResponseEntity.ok(transactionupdated);
@@ -96,10 +107,22 @@ public class TransactionRestController {
     public Transaction saveTransaction(@PathVariable("iduser") Long iduser,@PathVariable("idbien") Long idbien,@PathVariable("idprocedural") Long idprocedural, @RequestBody Transaction transaction) {
     transaction.setEtapeEnCours("Aucune");
     transaction.setProcedural(getProceduralById(idprocedural));
-    transaction.setBien(getbienById(iduser));
+    Bien bien = getbienById(idbien);
+    bien.setEtat("indisponible");
+    transaction.setBien(bien);
     transaction.setUtilisateur(getUtilisateurById(iduser));
 
         return transactionRepository.save(transaction);
+    }
+
+    @DeleteMapping("/transactions/{id}")
+    public ResponseEntity<Map<String, Boolean>> deleteTransaction(@PathVariable Long id){
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce proprietaire n'existe pas !!"))) ;
+        etapeRepository.deleteByTransaction(transaction);
+        transactionRepository.delete(transaction);
+        Map<String, Boolean> reponse = new HashMap<>();
+        reponse.put("supprime", Boolean.TRUE);
+        return ResponseEntity.ok(reponse);
     }
 
     private Procedural getProceduralById(Long id){
@@ -114,4 +137,5 @@ public class TransactionRestController {
     private Procuration getProcurationById(Long id){
         return procurationRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!")));
     }
+
 }

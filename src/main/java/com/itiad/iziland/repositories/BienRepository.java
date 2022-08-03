@@ -2,6 +2,7 @@ package com.itiad.iziland.repositories;
 
 
 import com.itiad.iziland.models.entities.Bien;
+import com.itiad.iziland.models.entities.Proprietaire;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -23,6 +24,8 @@ public interface BienRepository extends JpaRepository<Bien, Long> {
     List<Bien> findByTypeBienAndEtat(String typeBien, String etat);
 
     List<Bien> findByEtat(String etat);
+
+    List<Bien> findByProprietaire(Proprietaire proprietaire);
 
     List<Bien> findBySuperficieGreaterThanEqualAndEtat(Long superficie, String etat);
 

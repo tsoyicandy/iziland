@@ -142,7 +142,7 @@ public class FileInfoRestController {
         }
     }
 
-    @GetMapping( "/getImagesBien/{id}")
+    @GetMapping("/getImagesBien/{id}")
     public ResponseEntity<List<FileInfo>> getImagesBien(@PathVariable("id") Long id){
 
         try {
@@ -173,7 +173,7 @@ public class FileInfoRestController {
          }
 
     @DeleteMapping("/files/{filename}")
-    public ResponseEntity<Map<String, Boolean>> deleteBien(@PathVariable String filename) throws IOException {
+    public ResponseEntity<Map<String, Boolean>> deletefile(@PathVariable String filename) throws IOException {
         FileInfo fileInfo = fileInfoRepository.findByName(filename).orElseThrow(()-> new ResourceNotFoundException(("ce fichier n'existe pas !!"))) ;
         fileInfoRepository.delete(fileInfo);
         Files.delete(Paths.get(OUT_PATHI+filename));

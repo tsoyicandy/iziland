@@ -2,8 +2,14 @@ package com.itiad.iziland.presentation.restcontroller;
 
 
 import com.itiad.iziland.models.entities.Bien;
+import com.itiad.iziland.models.entities.FileInfo;
+import com.itiad.iziland.models.entities.Proprietaire;
 import com.itiad.iziland.repositories.BienRepository;
+import com.itiad.iziland.repositories.FileInfoRepository;
+import com.itiad.iziland.repositories.ProprietaireRepository;
 import com.itiad.iziland.security.exception.ResourceNotFoundException;
+import com.itiad.iziland.util.BienImage;
+import com.sun.org.apache.xerces.internal.xs.StringList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,23 +17,55 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/")
 public class BienRestController {
 
     @Autowired
     private BienRepository bienRepository;
+    @Autowired
+    private FileInfoRepository fileInfoRepository;
+
+    @Autowired
+    private ProprietaireRepository proprietaireRepository;
+
+    private Proprietaire getProprietaireById(Long id){
+        return proprietaireRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!")));
+    }
+
+    private List<String> getFileInfoByBien(Bien bien)  {
+        try {
+            List<FileInfo> fileInfos = fileInfoRepository.findByBien(bien);
+            List<String> urls = new ArrayList<String>();
+            for(int i = 0; i<fileInfos.size(); i++){
+                urls.add(i,fileInfos.get(i).getUrl());
+            }
+            return urls;
+        }catch (Exception e){
+            List<String> list = new ArrayList<>();
+            list.add(e.getMessage());
+            return list;
+        }
+    }
 
 
     @GetMapping("/biens")
-    public ResponseEntity< List<Bien>> getAllBien() {
+    public ResponseEntity<List<BienImage>> getAllBien() {
+
         try {
+            List<BienImage> bienImages = new ArrayList<BienImage>();
             List<Bien> biens = new ArrayList<Bien>();
             biens = bienRepository.findByEtat("disponible");
-            if (biens.isEmpty()){
+            BienImage bienImage;
+            for(int i = 0; i<biens.size(); i++){
+                bienImage = new BienImage(biens.get(i),getFileInfoByBien(biens.get(i)));
+                bienImages.add(i,bienImage);
+            }
+            if (bienImages.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }else{
-                return new ResponseEntity<>(biens, HttpStatus.OK);
+                return new ResponseEntity<>(bienImages, HttpStatus.OK);
             }
 
         }catch (Exception e) {
@@ -120,6 +158,22 @@ public class BienRestController {
     public ResponseEntity<List<Bien>> getEveryBien(){
         try {
             List<Bien> bienData = bienRepository.findAll();
+            if (bienData.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+
+                return new ResponseEntity<>(bienData, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @GetMapping("/biens/proprio/{idproprio}")
+    public ResponseEntity<List<Bien>> getBiensByProprietaire(@PathVariable("idproprio") Long idproprio){
+        try {
+            List<Bien> bienData = bienRepository.findByProprietaire(getProprietaireById(idproprio));
             if (bienData.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
