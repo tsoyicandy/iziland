@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,6 +72,7 @@ public class ProcurationRestController {
     public Procuration saveProcuration(@PathVariable("idutilisateur") Long idutilisateur, @RequestBody Procuration procuration){
 
         procuration.setUtilisateur(getUtilisateurById(idutilisateur));
+        procuration.setDateDeCreation(String.valueOf(Date.from(Instant.now())));
         String code = randomWordGenerator.generateRandomWord();
 
         procuration.setQrcode(code);

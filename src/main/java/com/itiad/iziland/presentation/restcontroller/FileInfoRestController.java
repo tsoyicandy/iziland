@@ -7,6 +7,9 @@ import com.itiad.iziland.repositories.BienRepository;
 import com.itiad.iziland.repositories.EtapeRepository;
 import com.itiad.iziland.repositories.FileInfoRepository;
 import com.itiad.iziland.security.exception.ResourceNotFoundException;
+import com.itiad.iziland.services.Iservices.DownloadService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -17,22 +20,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/")
 public class FileInfoRestController {
+    private Logger logger = LoggerFactory.getLogger(FileInfoRestController.class);
 
+    @Autowired
+    private DownloadService downloadService;
 
     @Autowired
     BienRepository bienRepository;
@@ -51,8 +55,8 @@ public class FileInfoRestController {
         return etapeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("cette étape n'existe pas !!")));
     }
 
-    private String OUT_PATHI = "D:\\stage\\iziland\\uploads\\images\\";
-    private String OUT_PATHD = "D:\\stage\\iziland\\uploads\\documents\\";
+    @Value("${projet.document}")
+    private String pathd;
 
     @Value("${projet.image}")
     private String path;
@@ -89,18 +93,19 @@ public class FileInfoRestController {
     }
     @PostMapping(value="/uploaddocuments/{idetape}")
     public ResponseEntity<String> uploadDocuments(@PathVariable("idetape") Long idetape , @RequestParam("file") List<MultipartFile> files) {
-        String message;
+        String message = "";
 
 
         if (files == null || files.size()==0){
-            message="Aucun Document ajoutée";
+            message="Aucun document ajouté";
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(message);
         }else {
 
             try {
+
                 for (MultipartFile mf : files) {
                     byte[] bytes = mf.getBytes();
-                    Path path = Paths.get(OUT_PATHD + mf.getOriginalFilename());
+                    Path path = Paths.get(this.pathd + File.separator+ mf.getOriginalFilename());
                     Files.write(path, bytes);
                     FileInfo fileInfo = new FileInfo(mf.getOriginalFilename(), path.toString());
                     fileInfo.setEtape(getEtapeById(idetape));
@@ -115,7 +120,6 @@ public class FileInfoRestController {
             }
             return ResponseEntity.status(HttpStatus.OK).body(message);
         }
-
     }
 
     @GetMapping("/imagesFiles")
@@ -161,29 +165,27 @@ public class FileInfoRestController {
         }
     }
 
-    @GetMapping("/files/{filename}")
+    @GetMapping("/files/{idetape}")
     @ResponseBody
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws MalformedURLException {
-        Path file = Paths.get(OUT_PATHI+filename);
-        Resource resource = new UrlResource(file.toUri());
-        if (resource.exists() || resource.isReadable()) {
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"").body(resource);
+    public ResponseEntity<String> downloadFile(@PathVariable Long idetape, HttpServletResponse response){
+       try {
+           List<FileInfo> fileInfos = fileInfoRepository.findByEtape(getEtapeById(idetape));
+           List<String> resources = new ArrayList<String>();
+           if (fileInfos.isEmpty()){
+               return new ResponseEntity<>("echec",HttpStatus.NO_CONTENT);
+           }else {
+               for (int i = 0; i < fileInfos.size(); i++) {
 
-        } else {
-            throw new RuntimeException("Could not read the file!");
-        }
+                   resources.add(fileInfos.get(i).getName());
+               }
+               downloadService.downloadZipFile(response, resources);
+               return new ResponseEntity<>("succes",HttpStatus.OK);
 
-         }
+           }
+       }catch (Exception e){
+           return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+       }
 
-    @DeleteMapping("/files/{filename}")
-    public ResponseEntity<Map<String, Boolean>> deletefile(@PathVariable String filename) throws IOException {
-        FileInfo fileInfo = fileInfoRepository.findByName(filename).orElseThrow(()-> new ResourceNotFoundException(("ce fichier n'existe pas !!"))) ;
-        fileInfoRepository.delete(fileInfo);
-        Files.delete(Paths.get(OUT_PATHI+filename));
-        Map<String, Boolean> reponse = new HashMap<>();
-        reponse.put("supprime", Boolean.TRUE);
-        return ResponseEntity.ok(reponse);
     }
 
     @GetMapping( "/getImage/{imageName}")
