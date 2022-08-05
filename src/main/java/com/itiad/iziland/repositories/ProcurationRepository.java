@@ -12,5 +12,5 @@ import java.util.Optional;
 @RepositoryRestResource
 public interface ProcurationRepository extends JpaRepository<Procuration, Long> {
     Optional<Procuration> findById(Long id);
-    List<Procuration> findByUtilisateur(Long id);
+    List<Procuration> findByUtilisateur(Utilisateur user);
 }

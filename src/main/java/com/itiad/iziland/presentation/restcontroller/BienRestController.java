@@ -74,6 +74,19 @@ public class BienRestController {
 
     }
 
+    @GetMapping("/bienImages/{id}")
+    public ResponseEntity<BienImage> getBienByIdPlusImages(@PathVariable("id") Long id){
+        try {
+            BienImage bienImage = new BienImage();
+            Bien bien = bienRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!"))) ;
+            bienImage.setBien(bien);
+            bienImage.setListImage(getFileInfoByBien(bien));
+            return ResponseEntity.ok(bienImage);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/biens")
     public ResponseEntity<Bien> saveBien(@RequestBody Bien bien) {
        Bien bien1 = bienRepository.save(bien);

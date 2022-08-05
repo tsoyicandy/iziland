@@ -14,20 +14,23 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String contenu;
+
+    private String type;
 
     @ManyToOne
     @JoinColumn(name="discussion")
     private Discussion discussion;
-    @ManyToOne
-    @JoinColumn(name="utilisateur")
-    private Utilisateur auteur;
+
+
+    private String sender;
 
     @Override
     public String toString() {
         return "Message{" +
                 "contenu='" + contenu + '\'' +
-                ", auteur=" + auteur.getNom() +
+                ", auteur=" + sender +
                 '}';
     }
 }

@@ -8,6 +8,7 @@ import com.itiad.iziland.repositories.EtapeRepository;
 import com.itiad.iziland.repositories.FileInfoRepository;
 import com.itiad.iziland.security.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -52,6 +54,8 @@ public class FileInfoRestController {
     private String OUT_PATHI = "D:\\stage\\iziland\\uploads\\images\\";
     private String OUT_PATHD = "D:\\stage\\iziland\\uploads\\documents\\";
 
+    @Value("${projet.image}")
+    private String path;
     @PostMapping(value="/uploadimages/{idbien}")
     private ResponseEntity<String> uploadImages(@PathVariable("idbien") Long idbien, @RequestParam("file") List<MultipartFile> files) {
         String message = "";
@@ -63,9 +67,10 @@ public class FileInfoRestController {
         }else {
 
             try {
+
                 for (MultipartFile mf : files) {
                     byte[] bytes = mf.getBytes();
-                    Path path = Paths.get(OUT_PATHI + mf.getOriginalFilename());
+                    Path path = Paths.get(this.path + File.separator+ mf.getOriginalFilename());
                     Files.write(path, bytes);
                     FileInfo fileInfo = new FileInfo(mf.getOriginalFilename(), path.toString());
                     fileInfo.setBien(getbienById(idbien));
@@ -81,8 +86,7 @@ public class FileInfoRestController {
             return ResponseEntity.status(HttpStatus.OK).body(message);
         }
 
-        }
-
+    }
     @PostMapping(value="/uploaddocuments/{idetape}")
     public ResponseEntity<String> uploadDocuments(@PathVariable("idetape") Long idetape , @RequestParam("file") List<MultipartFile> files) {
         String message;

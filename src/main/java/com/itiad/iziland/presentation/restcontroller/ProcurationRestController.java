@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/")
 public class ProcurationRestController {
@@ -39,7 +40,7 @@ public class ProcurationRestController {
 
 
 
-    @GetMapping("/qrcodes/{idprocuration}")
+    @GetMapping("/procurations/{idprocuration}")
     @ResponseBody
     public ResponseEntity<Resource> downloadQrcode(@PathVariable("idprocuration") Long idprocuration){
         Optional<Procuration> procuration = procurationRepository.findById(idprocuration);
@@ -106,9 +107,9 @@ public class ProcurationRestController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/qrcodes/{idutilisateur}")
+    @GetMapping("/procurations/get/{idutilisateur}")
     public ResponseEntity<List<Procuration>> findByUtilisateur(@PathVariable("idutilisateur") Long idutilisateur){
-        List procs = procurationRepository.findByUtilisateur(idutilisateur);
+        List procs = procurationRepository.findByUtilisateur(getUtilisateurById(idutilisateur));
         if (!procs.isEmpty()){
             return new ResponseEntity<>(procs,HttpStatus.OK);
         }else {

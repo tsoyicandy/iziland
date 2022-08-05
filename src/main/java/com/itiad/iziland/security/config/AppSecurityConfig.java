@@ -46,6 +46,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/api/v1/auth/**").permitAll()
                 .antMatchers("/api/v1/test/**").permitAll()
                 .antMatchers("/api/v1/**").permitAll()
+                .antMatchers("/spring-security-rest/**").permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
