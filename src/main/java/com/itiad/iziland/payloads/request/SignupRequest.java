@@ -27,5 +27,6 @@ public class SignupRequest {
     private String email;
     @NotBlank
     private String telephone;
+
     private Set<String> role;
 }

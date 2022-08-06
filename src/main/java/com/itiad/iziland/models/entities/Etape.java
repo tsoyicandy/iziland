@@ -23,13 +23,12 @@ public class Etape {
 
     private String etat;
 
+    private String nom;
+
     @ManyToOne
     @JoinColumn(name="transaction")
     private Transaction transaction;
 
-    @ManyToOne
-    @JoinColumn(name="processus")
-    private Processus processus;
 
     @OneToMany(mappedBy="etape")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

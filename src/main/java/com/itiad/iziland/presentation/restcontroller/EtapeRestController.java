@@ -1,10 +1,9 @@
 package com.itiad.iziland.presentation.restcontroller;
 
-import com.itiad.iziland.models.entities.Etape;
-import com.itiad.iziland.models.entities.Processus;
-import com.itiad.iziland.models.entities.Transaction;
+import com.itiad.iziland.models.entities.*;
 import com.itiad.iziland.repositories.EtapeRepository;
 import com.itiad.iziland.repositories.ProcessusRepository;
+import com.itiad.iziland.repositories.ProprietaireRepository;
 import com.itiad.iziland.repositories.TransactionRepository;
 import com.itiad.iziland.security.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,12 +26,20 @@ public class EtapeRestController {
     @Autowired
     private EtapeRepository etapeRepository;
     @Autowired
+    private ProprietaireRepository proprietaireRepository;
+    @Autowired
     private ProcessusRepository processusRepository;
     @Autowired
     private TransactionRepository transactionRepository;
 
+    private String nomProcessus(Transaction transaction, Long position){
+        List<Processus> processusList =  processusRepository.findProcessusesByProceduralOrderByNumeroEtapeAsc(transaction.getProcedural());
+        return processusRepository.findByNumeroEtape(position).get().getNom();
+    }
 
-    @GetMapping("/etapes")
+    private String message="";
+
+ /*   @GetMapping("/etapes")
     public ResponseEntity<List<Etape>> getAllEtapes() {
         try {
             List<Etape> etapes = new ArrayList<Etape>();
@@ -46,14 +55,7 @@ public class EtapeRestController {
         }
 
     }
-
-    @PostMapping("/etapes/{idtransaction}/{idprocessus}")
-    public ResponseEntity<Etape> saveEtape(@PathVariable("idtransaction") Long idtransaction,@PathVariable("idprocessus") Long idprocessus, @RequestBody Etape etape) {
-        etape.setProcessus(getProcessusById(idprocessus));
-        etape.setTransaction(getTransactionById(idtransaction));
-        Etape etape1 = etapeRepository.save(etape);
-        return new ResponseEntity<>(etape1, HttpStatus.CREATED);
-    }
+*/
 
     @GetMapping("/etapes/{id}")
     public ResponseEntity<Etape> getEtapeById(@PathVariable("id") Long id){
@@ -62,21 +64,56 @@ public class EtapeRestController {
     }
 
     @PutMapping("/etapes/{id}")
-    public ResponseEntity<Etape> updateTransaction(@PathVariable Long id, @RequestBody Etape etape){
-        Etape etape1 = etapeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("wrong transaction !!"))) ;
-        etape1.setEtat(etape.getEtat());
-        etape1.setDateFin(etape.getDateFin());
-        Etape etapeupdated = etapeRepository.save(etape1);
+    public ResponseEntity<String> updateEtape(@PathVariable Long id, @RequestBody Etape etape){
+        try {
+            Etape etape1 = etapeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("wrong transaction !!"))) ;
+            Transaction transaction = etape1.getTransaction();
+            etape1.setEtat("Termine");
+            etape1.setDateFin(String.valueOf(Date.valueOf(LocalDate.now())));
+            etapeRepository.save(etape1);
+            if (transaction.getEtapeEnCours() < transaction.getNombreDeProcessus()){
 
-        return ResponseEntity.ok(etapeupdated);
+                transaction.setEtapeEnCours(transaction.getEtapeEnCours()+1);
+                etape.setTransaction(transaction);
+                etape.setDateDebut(String.valueOf(Date.valueOf(LocalDate.now())));
+                etape.setDateFin("-");
+                etape.setEtat("Traitement");
+                etape.setNom(nomProcessus(transaction,transaction.getEtapeEnCours()));
+                etapeRepository.save(etape);
+                message="Etape suivante entamee";
+                return ResponseEntity.ok(message);
+            }else if (transaction.getEtapeEnCours() == transaction.getNombreDeProcessus()){
+                transaction.setEtapeEnCours(transaction.getEtapeEnCours()+1);
+                transaction.setDateFin(String.valueOf(Date.valueOf(LocalDate.now())));
+                transaction.setEtat("Termine");
+                Utilisateur utilisateur = transaction.getUtilisateur();
+                Proprietaire proprietaire = new Proprietaire();
+                proprietaire.setNom(utilisateur.getNom()+" "+utilisateur.getPrenom());
+                proprietaire.setEmail(utilisateur.getEmail());
+                proprietaire.setTelephone(utilisateur.getTelephone());
+                proprietaire.setAdresse("-");
+                proprietaireRepository.save(proprietaire);
+                transaction.getBien().setProprietaire(proprietaire);
+                transaction.getBien().setEtat("vendu");
+                transactionRepository.save(transaction);
+                message= "Traitement termine";
+                return ResponseEntity.ok(message);
+            }else {
+                message="Cette transaction est deja terminee";
+                return ResponseEntity.ok(message);
+            }
+        }catch (Exception e){
+            return ResponseEntity.ok(e.getMessage());
+        }
+
     }
 
     private Processus getProcessusById(Long id){
-        return processusRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!")));
+        return processusRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce processus n'existe pas !!")));
     }
 
     private Transaction getTransactionById(Long id){
-        return transactionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!")));
+        return transactionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce processus n'existe pas !!")));
     }
 
 }

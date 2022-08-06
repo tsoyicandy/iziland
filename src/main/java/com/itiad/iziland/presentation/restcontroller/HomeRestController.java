@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,13 @@ public class HomeRestController {
 
     @Autowired
     JwtUtil jwtUtils;
+
+    private Utilisateur getAGestionnaireByName(){
+        Role role = roleRepository.findByName(AppUtilisateurRole.GESTIONNAIRE);
+        Utilisateur managers =  userRepository.findByRole(role);
+        return managers;
+    }
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try{
@@ -86,26 +94,27 @@ public class HomeRestController {
 
         Set<String> strRoles =  signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
+        Set<Utilisateur> gestionnaire = new HashSet<>();
+        gestionnaire.add(getAGestionnaireByName());
+
         if (strRoles == null) {
-            Role userRole = roleRepository.findByName(AppUtilisateurRole.USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            Role userRole = roleRepository.findByName(AppUtilisateurRole.USER);
+            user.setGestionnaire(gestionnaire);
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        Role adminRole = roleRepository.findByName(AppUtilisateurRole.ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        Role adminRole = roleRepository.findByName(AppUtilisateurRole.ADMIN);
                         roles.add(adminRole);
                         break;
                     case "ges":
-                        Role gesRole = roleRepository.findByName(AppUtilisateurRole.GESTIONNAIRE)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        Role gesRole = roleRepository.findByName(AppUtilisateurRole.GESTIONNAIRE);
                         roles.add(gesRole);
                         break;
                     default:
-                        Role userRole = roleRepository.findByName(AppUtilisateurRole.USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        Role userRole = roleRepository.findByName(AppUtilisateurRole.USER);
+                        user.setGestionnaire(gestionnaire);
                         roles.add(userRole);
                 }
             });

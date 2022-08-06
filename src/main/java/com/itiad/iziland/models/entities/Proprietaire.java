@@ -19,13 +19,13 @@ public class Proprietaire {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotBlank(message = "votre nom est obligatoire")
+
     private String nom;
 
-    @Email(message = "entrez un mail correct")
+
     private String email;
 
-    @NotBlank(message = "votre numero de telephone est obligatoire")
+
     private String telephone;
 
     private String adresse;

@@ -50,11 +50,10 @@ public class ProcurationRestController {
         byte[] file = qrCodeService.generateQrCode(
                 code
                         +"\n"+procuration.get().getMotif()
-                        +"\n"+procuration.get().getNomBeneficiare()
-                        +"\n"+procuration.get().getCni()
-                        +"\n Procuration crée le "+procuration.get().getDateDeCreation()
-                        +"\n par :  "+procuration.get().getUtilisateur().getNom()
-                        +"\n "+procuration.get().getUtilisateur().getPrenom()
+                        +"\n Mandataire : "+procuration.get().getNomBeneficiare()
+                        +"\n CNI : "+procuration.get().getCni()
+                        +"\n Procuration cree le "+procuration.get().getDateDeCreation()
+                        +"\n par :  "+procuration.get().getUtilisateur().getNom()+"  "+procuration.get().getUtilisateur().getPrenom()
                 ,WIDTH,HEIGHT);
         Resource resource = new ByteArrayResource(file);
         if (resource.exists() || resource.isReadable()) {
@@ -72,7 +71,9 @@ public class ProcurationRestController {
     public Procuration saveProcuration(@PathVariable("idutilisateur") Long idutilisateur, @RequestBody Procuration procuration){
 
         procuration.setUtilisateur(getUtilisateurById(idutilisateur));
+
         procuration.setDateDeCreation(String.valueOf(Date.from(Instant.now())));
+
         String code = randomWordGenerator.generateRandomWord();
 
         procuration.setQrcode(code);
@@ -116,7 +117,7 @@ public class ProcurationRestController {
         if (!procs.isEmpty()){
             return new ResponseEntity<>(procs,HttpStatus.OK);
         }else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(procs,HttpStatus.NOT_FOUND);
         }
     }
 

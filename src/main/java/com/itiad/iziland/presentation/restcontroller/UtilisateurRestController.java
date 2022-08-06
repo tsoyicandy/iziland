@@ -1,8 +1,11 @@
 package com.itiad.iziland.presentation.restcontroller;
 
+import com.itiad.iziland.models.entities.Role;
 import com.itiad.iziland.models.entities.Utilisateur;
+import com.itiad.iziland.repositories.RoleRepository;
 import com.itiad.iziland.repositories.UtilisateurRepository;
 import com.itiad.iziland.security.exception.ResourceNotFoundException;
+import com.itiad.iziland.util.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +20,20 @@ public class UtilisateurRestController {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @GetMapping("/utilisateurs")
-    public List<Utilisateur> getAllUtilisateur() {
-        return utilisateurRepository.findAll();
+    public List<UserRole> getAllUtilisateur() {
+        List<Utilisateur> utilisateurs = utilisateurRepository.findAll();
+        List<UserRole> userRoles =null;
+        UserRole userRole = null;
+        for (Utilisateur utilisateur : utilisateurs) {
+            assert false;
+            userRole.setUtilisateur(utilisateur);
+            userRole.setRole((Role) utilisateur.getRole());
+        }
+        return userRoles;
     }
 
     @GetMapping("/utilisateurs/{id}")

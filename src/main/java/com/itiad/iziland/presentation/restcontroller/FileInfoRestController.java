@@ -176,7 +176,7 @@ public class FileInfoRestController {
            }else {
                for (int i = 0; i < fileInfos.size(); i++) {
 
-                   resources.add(fileInfos.get(i).getName());
+                   resources.add(this.pathd+File.separator+fileInfos.get(i).getName());
                }
                downloadService.downloadZipFile(response, resources);
                return new ResponseEntity<>("succes",HttpStatus.OK);
