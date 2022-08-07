@@ -24,7 +24,8 @@ import java.util.Map;
 public class EtapeRestController {
 
     @Autowired
-    private EtapeRepository etapeRepository;
+    private EtapeRepository etapeRepository ;
+
     @Autowired
     private ProprietaireRepository proprietaireRepository;
     @Autowired
@@ -58,10 +59,18 @@ public class EtapeRestController {
 */
 
     @GetMapping("/etapes/{id}")
-    public ResponseEntity<Etape> getEtapeById(@PathVariable("id") Long id){
+    public ResponseEntity<Etape> getEtapesById(@PathVariable("id") Long id){
         Etape etape = etapeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!"))) ;
         return ResponseEntity.ok(etape);
     }
+
+    @GetMapping("/etapes/transaction/{idtransaction}")
+    public ResponseEntity<List<Etape>> getEtapesByTransaction(@PathVariable("idtransaction") Long idtransaction){
+        
+        List<Etape> etape = etapeRepository.findByTransaction(getTransactionById(idtransaction)) ;
+        return ResponseEntity.ok(etape);
+    }
+
 
     @PutMapping("/etapes/{id}")
     public ResponseEntity<String> updateEtape(@PathVariable Long id, @RequestBody Etape etape){

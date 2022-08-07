@@ -109,39 +109,44 @@ public class TransactionRestController {
 
     @GetMapping("/transactions/{iduser}/{idbien}/{idprocuration}")
     public ResponseEntity<String> saveTransaction(@PathVariable("iduser") Long iduser, @PathVariable("idbien") Long idbien, @PathVariable("idprocuration") Long idprocuration) {
-        Transaction transaction = new Transaction();
-
-        Utilisateur utilisateur = utilisateurRepository.findById(iduser).get();
         Bien bien = bienRepository.findById(idbien).get();
-        Procuration procuration = procurationRepository.findById(idprocuration).get();
-        Procedural procedural = getProceduralByNom("Acheter");
-        try {
-            transaction.setUtilisateur(utilisateur);
-            transaction.setBien(bien);
-            transaction.setProcuration(procuration);
-            transaction.setProcedural(procedural);
-            transaction.setEtat("Traitement");
-            bien.setEtat("indisponible");
-            //transaction.setBien(bien);
-            transaction.setDateDebut(String.valueOf(Date.valueOf(LocalDate.now())));
-            transaction.setDateFin("-");
-            //transaction.setUtilisateur(getUtilisateurById(iduser));
-            transaction.setNombreDeProcessus(((long) transaction.getProcedural().getListprocessus().size() == 0 )? 0 :(long) transaction.getProcedural().getListprocessus().size() );
-            //transaction.setProcuration(getProcurationById(idprocuration));
-            transaction.setEtapeEnCours(1L);
-            System.out.println(transaction.getEtapeEnCours());
-            Transaction tr = transactionRepository.save(transaction);
-            Etape etape = new Etape();
-            etape.setTransaction(tr);
-            etape.setDateDebut(String.valueOf(Date.valueOf(LocalDate.now())));
-            etape.setDateFin("-");
-            etape.setEtat("Traitement");
-            etape.setNom(nomProcessus(tr,tr.getEtapeEnCours()));
-            etapeRepository.save(etape);
-            return ResponseEntity.ok("Procuration ajoutee avec succes");
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            return ResponseEntity.ok(e.getMessage());
+        if (bien.getEtat() == "disponible" ){
+
+            Transaction transaction = new Transaction();
+            Utilisateur utilisateur = utilisateurRepository.findById(iduser).get();
+
+            Procuration procuration = procurationRepository.findById(idprocuration).get();
+            Procedural procedural = getProceduralByNom("Acheter");
+            try {
+                transaction.setUtilisateur(utilisateur);
+                transaction.setBien(bien);
+                transaction.setProcuration(procuration);
+                transaction.setProcedural(procedural);
+                transaction.setEtat("Traitement");
+                bien.setEtat("indisponible");
+                //transaction.setBien(bien);
+                transaction.setDateDebut(String.valueOf(Date.valueOf(LocalDate.now())));
+                transaction.setDateFin("-");
+                //transaction.setUtilisateur(getUtilisateurById(iduser));
+                transaction.setNombreDeProcessus(((long) transaction.getProcedural().getListprocessus().size() == 0 )? 0 :(long) transaction.getProcedural().getListprocessus().size() );
+                //transaction.setProcuration(getProcurationById(idprocuration));
+                transaction.setEtapeEnCours(1L);
+                System.out.println(transaction.getEtapeEnCours());
+                Transaction tr = transactionRepository.save(transaction);
+                Etape etape = new Etape();
+                etape.setTransaction(tr);
+                etape.setDateDebut(String.valueOf(Date.valueOf(LocalDate.now())));
+                etape.setDateFin("-");
+                etape.setEtat("Traitement");
+                etape.setNom(nomProcessus(tr,tr.getEtapeEnCours()));
+                etapeRepository.save(etape);
+                return ResponseEntity.ok("Transaction lancee avec succes");
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+                return ResponseEntity.ok(e.getMessage());
+            }
+        }else{
+             return ResponseEntity.badRequest().body("Impossible de lancer la procedure avec ce bien");
         }
     }
 
