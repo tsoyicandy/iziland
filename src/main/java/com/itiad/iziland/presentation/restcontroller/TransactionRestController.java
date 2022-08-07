@@ -107,32 +107,41 @@ public class TransactionRestController {
 
     }*/
 
-    @PostMapping("/transactions/{iduser}/{idbien}/{idprocuration}")
-    public ResponseEntity<String> saveTransaction(@PathVariable("iduser") Long iduser, @PathVariable("idbien") Long idbien, @PathVariable("idprocuration") Long idprocuration, @RequestBody Transaction transaction) {
+    @GetMapping("/transactions/{iduser}/{idbien}/{idprocuration}")
+    public ResponseEntity<String> saveTransaction(@PathVariable("iduser") Long iduser, @PathVariable("idbien") Long idbien, @PathVariable("idprocuration") Long idprocuration) {
+        Transaction transaction = new Transaction();
+
+        Utilisateur utilisateur = utilisateurRepository.findById(iduser).get();
+        Bien bien = bienRepository.findById(idbien).get();
+        Procuration procuration = procurationRepository.findById(idprocuration).get();
+        Procedural procedural = getProceduralByNom("Acheter");
         try {
-            transaction.setProcedural(getProceduralByNom("Acheter"));
-            transaction.setEtat("Traitement");
-            Bien bien = getbienById(idbien);
-            bien.setEtat("indisponible");
+            transaction.setUtilisateur(utilisateur);
             transaction.setBien(bien);
+            transaction.setProcuration(procuration);
+            transaction.setProcedural(procedural);
+            transaction.setEtat("Traitement");
+            bien.setEtat("indisponible");
+            //transaction.setBien(bien);
             transaction.setDateDebut(String.valueOf(Date.valueOf(LocalDate.now())));
             transaction.setDateFin("-");
-            transaction.setUtilisateur(getUtilisateurById(iduser));
-            transaction.setNombreDeProcessus((long) transaction.getProcedural().getListprocessus().size());
-            transaction.setProcuration(getProcurationById(idprocuration));
+            //transaction.setUtilisateur(getUtilisateurById(iduser));
+            transaction.setNombreDeProcessus(((long) transaction.getProcedural().getListprocessus().size() == 0 )? 0 :(long) transaction.getProcedural().getListprocessus().size() );
+            //transaction.setProcuration(getProcurationById(idprocuration));
             transaction.setEtapeEnCours(1L);
-            transactionRepository.save(transaction);
+            System.out.println(transaction.getEtapeEnCours());
+            Transaction tr = transactionRepository.save(transaction);
             Etape etape = new Etape();
-            etape.setTransaction(transaction);
+            etape.setTransaction(tr);
             etape.setDateDebut(String.valueOf(Date.valueOf(LocalDate.now())));
+            etape.setDateFin("-");
             etape.setEtat("Traitement");
-            etape.setNom(nomProcessus(transaction,transaction.getEtapeEnCours()));
+            etape.setNom(nomProcessus(tr,tr.getEtapeEnCours()));
             etapeRepository.save(etape);
-            transactionRepository.save(transaction);
-
             return ResponseEntity.ok("Procuration ajoutee avec succes");
         }catch (Exception e){
-            return ResponseEntity.ok("Echec de la manoeuvre");
+            System.out.println(e.getMessage());
+            return ResponseEntity.ok(e.getMessage());
         }
     }
 

@@ -55,7 +55,7 @@ public class FileInfoRestController {
         return etapeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("cette étape n'existe pas !!")));
     }
 
-    @Value("${projet.document}")
+    @Value("${projet.image}")
     private String pathd;
 
     @Value("${projet.image}")

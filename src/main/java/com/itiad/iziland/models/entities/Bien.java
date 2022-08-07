@@ -22,6 +22,8 @@ public class Bien {
     private String typeBien;
     private String description;
     private String lieu;
+    private String departement;
+
 
     @ManyToOne
     @JoinColumn(name="proprietaire")

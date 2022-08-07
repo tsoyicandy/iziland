@@ -39,7 +39,7 @@ public class BienRestController {
             List<FileInfo> fileInfos = fileInfoRepository.findByBien(bien);
             List<String> urls = new ArrayList<String>();
             for(int i = 0; i<fileInfos.size(); i++){
-                urls.add(i,fileInfos.get(i).getUrl());
+                urls.add(i,fileInfos.get(i).getName());
             }
             return urls;
         }catch (Exception e){
