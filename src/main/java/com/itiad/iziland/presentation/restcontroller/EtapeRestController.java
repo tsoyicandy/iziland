@@ -66,9 +66,13 @@ public class EtapeRestController {
 
     @GetMapping("/etapes/transaction/{idtransaction}")
     public ResponseEntity<List<Etape>> getEtapesByTransaction(@PathVariable("idtransaction") Long idtransaction){
-        
-        List<Etape> etape = etapeRepository.findByTransaction(getTransactionById(idtransaction)) ;
-        return ResponseEntity.ok(etape);
+        List<Etape> etapes = etapeRepository.findByTransaction(getTransactionById(idtransaction)) ;
+        if (!etapes.isEmpty())
+        {
+            return ResponseEntity.ok(etapes);
+        }else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 
