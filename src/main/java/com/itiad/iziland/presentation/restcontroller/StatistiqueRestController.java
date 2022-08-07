@@ -22,17 +22,16 @@ public class StatistiqueRestController {
 
     @GetMapping("/stats")
     public ResponseEntity<Statistique> getAllStatistiques(){
-        Statistique statistique = new Statistique(
-                statisqueService.getnombreTransactionEnCours(),
-                statisqueService.getnombreUtilisateursApplication(),
-                statisqueService.getnombreBiensDisponible(),
-                statisqueService.getnombreBiensVendu(),
-                statisqueService.getnombreTransactionTerminees(),
-                statisqueService.getnombreProprietaire(),
-                statisqueService.getnombreTerrain(),
-                statisqueService.getnombreTransactionAnnulee(),
-                statisqueService.getnombreProcurationGeneree()
-        );
+        Statistique statistique = new Statistique();
+           statistique.setNombreTransactionEnCours(statisqueService.getnombreTransactionEnCours());
+           statistique.setNombreUtilisateursApplication(statisqueService.getnombreUtilisateursApplication());
+           statistique.setNombreBiensDisponible(statisqueService.getnombreBiensDisponible());
+           statistique.setNombreBiensVendu(statisqueService.getnombreBiensVendu());
+           statistique.setNombreTransactionTerminees(statisqueService.getnombreTransactionTerminees());
+           statistique.setNombreProprietaire(statisqueService.getnombreProprietaire());
+           statistique.setNombreTerrain(statisqueService.getnombreTerrainDisponible());
+           statistique.setNombreTransactionAnnulee(statisqueService.getnombreTransactionAnnulee());
+           statistique.setNombreProcurationGeneree(statisqueService.getnombreProcurationGeneree());
         return ResponseEntity.ok(statistique);
 
     }

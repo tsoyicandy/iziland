@@ -7,7 +7,7 @@ public interface StatisqueService {
     Long getnombreBiensVendu();
     Long getnombreTransactionTerminees();
     Long getnombreProprietaire();
-    Long getnombreTerrain();
+    Long getnombreTerrainDisponible();
     Long getnombreTransactionAnnulee();
     Long getnombreProcurationGeneree();
 
