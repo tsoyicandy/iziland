@@ -108,13 +108,12 @@ public class TransactionRestController {
     }*/
 
     @GetMapping("/transactions/{iduser}/{idbien}/{idprocuration}")
-    public ResponseEntity<String> saveTransaction(@PathVariable("iduser") Long iduser, @PathVariable("idbien") Long idbien, @PathVariable("idprocuration") Long idprocuration) {
-        Bien bien = bienRepository.findById(idbien).get();
-        if (bien.getEtat() == "disponible" ){
+    public ResponseEntity<Transaction> saveTransaction(@PathVariable("iduser") Long iduser, @PathVariable("idbien") Long idbien, @PathVariable("idprocuration") Long idprocuration) {
+
 
             Transaction transaction = new Transaction();
             Utilisateur utilisateur = utilisateurRepository.findById(iduser).get();
-
+            Bien bien = bienRepository.findById(idbien).get();
             Procuration procuration = procurationRepository.findById(idprocuration).get();
             Procedural procedural = getProceduralByNom("Acheter");
             try {
@@ -140,14 +139,11 @@ public class TransactionRestController {
                 etape.setEtat("Traitement");
                 etape.setNom(nomProcessus(tr,tr.getEtapeEnCours()));
                 etapeRepository.save(etape);
-                return ResponseEntity.ok("Transaction lancee avec succes");
+                return ResponseEntity.ok(tr);
             }catch (Exception e){
                 System.out.println(e.getMessage());
-                return ResponseEntity.ok(e.getMessage());
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-        }else{
-             return ResponseEntity.badRequest().body("Impossible de lancer la procedure avec ce bien");
-        }
     }
 
     @PutMapping("/transactions/{id}")

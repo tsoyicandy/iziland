@@ -73,6 +73,7 @@ public class HomeRestController {
             return new ResponseEntity(new MessageResponse(e.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByNom(signUpRequest.getNom())) {

@@ -9,10 +9,12 @@ import com.itiad.iziland.security.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,9 +60,9 @@ public class EtapeRestController {
     }
 */
 
-    @GetMapping("/etapes/{id}")
+    @GetMapping("/etapes/une/{id}")
     public ResponseEntity<Etape> getEtapesById(@PathVariable("id") Long id){
-        Etape etape = etapeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!"))) ;
+        Etape etape = etapeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("cette etape n'existe pas !!"))) ;
         return ResponseEntity.ok(etape);
     }
 
@@ -76,28 +78,30 @@ public class EtapeRestController {
     }
 
 
-    @PutMapping("/etapes/{id}")
-    public ResponseEntity<String> updateEtape(@PathVariable Long id, @RequestBody Etape etape){
+    @GetMapping("/etapes/{id}")
+    @PreAuthorize(" hasRole('GESTIONNAIRE')")
+    public ResponseEntity<Etape> updateEtape(@PathVariable Long id ){
+        Etape etape = new Etape();
         try {
             Etape etape1 = etapeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("wrong transaction !!"))) ;
             Transaction transaction = etape1.getTransaction();
             etape1.setEtat("Termine");
-            etape1.setDateFin(String.valueOf(Date.valueOf(LocalDate.now())));
+            etape1.setDateFin(String.valueOf(Date.valueOf(String.valueOf(LocalDateTime.now()))));
             etapeRepository.save(etape1);
             if (transaction.getEtapeEnCours() < transaction.getNombreDeProcessus()){
 
                 transaction.setEtapeEnCours(transaction.getEtapeEnCours()+1);
                 etape.setTransaction(transaction);
-                etape.setDateDebut(String.valueOf(Date.valueOf(LocalDate.now())));
+                etape.setDateDebut(String.valueOf(Date.valueOf(String.valueOf(LocalDateTime.now()))));
                 etape.setDateFin("-");
                 etape.setEtat("Traitement");
                 etape.setNom(nomProcessus(transaction,transaction.getEtapeEnCours()));
-                etapeRepository.save(etape);
+                Etape step = etapeRepository.save(etape);
                 message="Etape suivante entamee";
-                return ResponseEntity.ok(message);
+                return ResponseEntity.ok(step);
             }else if (transaction.getEtapeEnCours() == transaction.getNombreDeProcessus()){
                 transaction.setEtapeEnCours(transaction.getEtapeEnCours()+1);
-                transaction.setDateFin(String.valueOf(Date.valueOf(LocalDate.now())));
+                transaction.setDateFin(String.valueOf(Date.valueOf(String.valueOf(LocalDateTime.now()))));
                 transaction.setEtat("Termine");
                 Utilisateur utilisateur = transaction.getUtilisateur();
                 Proprietaire proprietaire = new Proprietaire();
@@ -110,13 +114,13 @@ public class EtapeRestController {
                 transaction.getBien().setEtat("vendu");
                 transactionRepository.save(transaction);
                 message= "Traitement termine";
-                return ResponseEntity.ok(message);
+                return ResponseEntity.ok(etape);
             }else {
                 message="Cette transaction est deja terminee";
-                return ResponseEntity.ok(message);
+                return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
             }
         }catch (Exception e){
-            return ResponseEntity.ok(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
         }
 
     }

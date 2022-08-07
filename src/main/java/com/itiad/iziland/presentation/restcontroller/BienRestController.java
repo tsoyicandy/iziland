@@ -13,6 +13,7 @@ import com.sun.org.apache.xerces.internal.xs.StringList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -88,10 +89,10 @@ public class BienRestController {
     }
 
     @PostMapping("/biens")
+    @PreAuthorize(" hasRole('GESTIONNAIRE') or hasRole('ADMIN')")
     public ResponseEntity<Bien> saveBien(@RequestBody Bien bien) {
        Bien bien1 = bienRepository.save(bien);
         return new ResponseEntity<>(bien1, HttpStatus.CREATED);
-
     }
 
     @GetMapping("/biens/{id}")
@@ -101,6 +102,7 @@ public class BienRestController {
     }
 
     @PutMapping("/biens/{id}")
+    @PreAuthorize(" hasRole('GESTIONNAIRE') or hasRole('ADMIN')")
     public ResponseEntity<Bien> updateBien(@PathVariable Long id, @RequestBody Bien bien){
         Bien bienexistant = bienRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!"))) ;
         bienexistant.setId(id);
@@ -123,6 +125,7 @@ public class BienRestController {
     }
 
     @DeleteMapping("/biens/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Boolean>> deleteBien(@PathVariable Long id){
         Bien bien = bienRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce bien n'existe pas !!"))) ;
         bienRepository.delete(bien);
@@ -141,17 +144,8 @@ public class BienRestController {
         }
     }
 
-    @DeleteMapping("/biens/listedesbiens/{listedesbiens}")
-    public ResponseEntity<HttpStatus> deleteAllBiens(@PathVariable("listedesbiens")  List<Bien> listedesbiens ){
-        try{
-            bienRepository.deleteAllInBatch(listedesbiens);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
-    @GetMapping("/biens/recherchenom/{nomrecherche}")
+   @GetMapping("/biens/recherchenom/{nomrecherche}")
     public ResponseEntity<List<Bien>> findAllBiens(@PathVariable("nomrecherche") String nomrecherche){
         try {
             List<Bien> bienData = bienRepository.findByNomContainingIgnoreCaseAndEtat(nomrecherche,"disponible");
@@ -168,6 +162,7 @@ public class BienRestController {
     }
 
     @GetMapping("/biens/touslesbiens")
+    @PreAuthorize(" hasRole('ADMIN')")
     public ResponseEntity<List<Bien>> getEveryBien(){
         try {
             List<Bien> bienData = bienRepository.findAll();
@@ -184,6 +179,7 @@ public class BienRestController {
     }
 
     @GetMapping("/biens/proprio/{idproprio}")
+    @PreAuthorize(" hasRole('ADMIN')")
     public ResponseEntity<List<Bien>> getBiensByProprietaire(@PathVariable("idproprio") Long idproprio){
         try {
             List<Bien> bienData = bienRepository.findByProprietaire(getProprietaireById(idproprio));
@@ -294,5 +290,6 @@ public class BienRestController {
         }
 
     }
+
 
 }

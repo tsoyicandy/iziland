@@ -17,6 +17,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,8 +61,10 @@ public class FileInfoRestController {
 
     @Value("${projet.image}")
     private String path;
+
     @PostMapping(value="/uploadimages/{idbien}")
-    private ResponseEntity<String> uploadImages(@PathVariable("idbien") Long idbien, @RequestParam("file") List<MultipartFile> files) {
+    @PreAuthorize(" hasRole('GESTIONNAIRE')")
+    public ResponseEntity<String> uploadImages(@PathVariable("idbien") Long idbien, @RequestParam("file") List<MultipartFile> files) {
         String message = "";
 
 
@@ -91,7 +94,10 @@ public class FileInfoRestController {
         }
 
     }
+
+
     @PostMapping(value="/uploaddocuments/{idetape}")
+    @PreAuthorize(" hasRole('GESTIONNAIRE')")
     public ResponseEntity<String> uploadDocuments(@PathVariable("idetape") Long idetape , @RequestParam("file") List<MultipartFile> files) {
         String message = "";
 
@@ -166,6 +172,7 @@ public class FileInfoRestController {
     }
 
     @GetMapping("/files/{idetape}")
+    @PreAuthorize(" hasRole('USER')")
     @ResponseBody
     public ResponseEntity<String> downloadFile(@PathVariable Long idetape, HttpServletResponse response){
        try {
