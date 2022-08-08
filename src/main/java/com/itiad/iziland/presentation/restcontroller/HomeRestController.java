@@ -47,11 +47,7 @@ public class HomeRestController {
     @Autowired
     JwtUtil jwtUtils;
 
-    private Utilisateur getAGestionnaireByName(){
-        Role role = roleRepository.findByName(AppUtilisateurRole.GESTIONNAIRE);
-        Utilisateur managers =  userRepository.findByRole(role);
-        return managers;
-    }
+
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -95,13 +91,10 @@ public class HomeRestController {
 
         Set<String> strRoles =  signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
-        Set<Utilisateur> gestionnaire = new HashSet<>();
-        gestionnaire.add(getAGestionnaireByName());
 
         if (strRoles == null) {
             Role userRole = roleRepository.findByName(AppUtilisateurRole.USER);
-            user.setGestionnaire(gestionnaire);
-            roles.add(userRole);
+
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
@@ -115,7 +108,6 @@ public class HomeRestController {
                         break;
                     default:
                         Role userRole = roleRepository.findByName(AppUtilisateurRole.USER);
-                        user.setGestionnaire(gestionnaire);
                         roles.add(userRole);
                 }
             });

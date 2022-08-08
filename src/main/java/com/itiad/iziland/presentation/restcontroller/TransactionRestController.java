@@ -6,6 +6,7 @@ import com.itiad.iziland.security.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -61,27 +62,6 @@ public class TransactionRestController {
     }
     }
 
-    @GetMapping("/transactions/parGestionnaire/{idutilisateur}")
-    public ResponseEntity<List<Transaction>> getTransactionsByGestionnaire(@PathVariable("idutilisateur") Long idutilisateur){
-        try{
-            Utilisateur utilisateur = getUtilisateurById(idutilisateur);
-            List<Utilisateur> utilisateurs = utilisateurRepository.findUtilisateurByGestionnaire(utilisateur);
-            List<Transaction> transactions = null;
-           for (int i=0; i<utilisateurs.size();i++){
-
-               transactions = transactionRepository.findByUtilisateurAndEtat(utilisateurs.get(i), "Traitement");
-               transactions.addAll(transactionRepository.findByUtilisateurAndEtat(utilisateurs.get(i), "Termine"));
-           }
-            if (transactions.isEmpty()){
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }else{
-                return new ResponseEntity<>(transactions, HttpStatus.OK);
-            }
-        }catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
    /* @PutMapping("/transactions/terminate/{id}")
     public ResponseEntity<String> terminateTransaction(@PathVariable Long id){
         try {
@@ -108,6 +88,7 @@ public class TransactionRestController {
     }*/
 
     @GetMapping("/transactions/{iduser}/{idbien}/{idprocuration}")
+    @PreAuthorize(" hasRole('USER')")
     public ResponseEntity<Transaction> saveTransaction(@PathVariable("iduser") Long iduser, @PathVariable("idbien") Long idbien, @PathVariable("idprocuration") Long idprocuration) {
 
 
@@ -147,6 +128,7 @@ public class TransactionRestController {
     }
 
     @PutMapping("/transactions/{id}")
+    @PreAuthorize(" hasRole('USER')")
     public ResponseEntity<String> abortTransaction(@PathVariable("id") Long id) {
         try {
             Transaction transaction = transactionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("cette transaction n'existe pas !!"))) ;

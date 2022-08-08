@@ -5,6 +5,7 @@ import com.itiad.iziland.models.Statistique;
 import com.itiad.iziland.services.Iservices.StatisqueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ public class StatistiqueRestController {
     private StatisqueService statisqueService;
 
     @GetMapping("/stats")
+    @PreAuthorize(" hasRole('ADMIN')")
     public ResponseEntity<Statistique> getAllStatistiques(){
         Statistique statistique = new Statistique();
            statistique.setNombreTransactionEnCours(statisqueService.getnombreTransactionEnCours());

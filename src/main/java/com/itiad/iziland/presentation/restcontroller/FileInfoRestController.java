@@ -95,7 +95,6 @@ public class FileInfoRestController {
 
     }
 
-
     @PostMapping(value="/uploaddocuments/{idetape}")
     @PreAuthorize(" hasRole('GESTIONNAIRE')")
     public ResponseEntity<String> uploadDocuments(@PathVariable("idetape") Long idetape , @RequestParam("file") List<MultipartFile> files) {

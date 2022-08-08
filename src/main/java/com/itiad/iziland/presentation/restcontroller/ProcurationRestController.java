@@ -13,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -68,6 +69,7 @@ public class ProcurationRestController {
     }
 
     @PostMapping("/procurations/{idutilisateur}")
+    @PreAuthorize(" hasRole('USER')")
     public Procuration saveProcuration(@PathVariable("idutilisateur") Long idutilisateur, @RequestBody Procuration procuration){
 
         procuration.setUtilisateur(getUtilisateurById(idutilisateur));

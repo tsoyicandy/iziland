@@ -8,6 +8,7 @@ import com.itiad.iziland.security.exception.ResourceNotFoundException;
 import com.itiad.iziland.util.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -24,16 +25,10 @@ public class UtilisateurRestController {
     private RoleRepository roleRepository;
 
     @GetMapping("/utilisateurs")
-    public List<UserRole> getAllUtilisateur() {
+    @PreAuthorize(" hasRole('ADMIN')")
+    public List<Utilisateur> getAllUtilisateur() {
         List<Utilisateur> utilisateurs = utilisateurRepository.findAll();
-        List<UserRole> userRoles =null;
-        UserRole userRole = null;
-        for (Utilisateur utilisateur : utilisateurs) {
-            assert false;
-            userRole.setUtilisateur(utilisateur);
-            userRole.setRole((Role) utilisateur.getRole());
-        }
-        return userRoles;
+        return utilisateurs;
     }
 
     @GetMapping("/utilisateurs/{id}")
@@ -67,6 +62,7 @@ public class UtilisateurRestController {
     }
 
     @PostMapping("/utilisateurs")
+    @PreAuthorize(" hasRole('ADMIN')")
     public Utilisateur saveUtilisateur(@RequestBody Utilisateur utilisateur) {
         return utilisateurRepository.save(utilisateur);
     }

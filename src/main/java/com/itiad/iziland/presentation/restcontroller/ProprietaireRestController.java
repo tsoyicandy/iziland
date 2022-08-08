@@ -5,6 +5,7 @@ import com.itiad.iziland.repositories.ProprietaireRepository;
 import com.itiad.iziland.security.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class ProprietaireRestController {
     }
 
     @PutMapping("/proprietaires/{id}")
+    @PreAuthorize(" hasRole('ADMIN')")
     public ResponseEntity<Proprietaire> updateProprietaire(@PathVariable Long id, @RequestBody Proprietaire proprietaire){
         Proprietaire proprietaireExistant = proprietaireRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(("ce Proprietaire n'existe pas !!"))) ;
         proprietaireExistant.setId(id);
@@ -53,6 +55,7 @@ public class ProprietaireRestController {
     }
 
     @PostMapping("/proprietaires")
+    @PreAuthorize(" hasRole('ADMIN')")
     public Proprietaire saveProprietaire(@RequestBody Proprietaire proprietaire) {
         return proprietaireRepository.save(proprietaire);
     }
